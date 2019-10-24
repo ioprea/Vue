@@ -7,6 +7,9 @@
         ul.ingredients
           li(v-for="(ingredient, index) in cocktail.ingredients" :key="ingredient.id") 
             span.chip {{ingredient}}
+      span.btn-floating.btn-large.halfway-fab.pink
+        router-link(:to="{ name: 'EditCocktail', params: { slug: cocktail.slug }}")
+          i.material-icons.edit edit
 </template>
 <script>
 import db from '@/firebase/init.js'

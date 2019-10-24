@@ -20,9 +20,14 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './App.vue')
     },
     {
-      path: '/addCocktail',
+      path: '/add-cocktail',
       name: 'AddCocktail',
       component: () => import(/* webpackChunkName: "about" */ './components/AddCocktail.vue')
+    },
+    {
+      path: '/edit-cocktail/:slug',
+      name: 'EditCocktail',
+      component: () => import(/* webpackChunkName: "about" */ './components/EditCocktail.vue')
     }
   ]
 })

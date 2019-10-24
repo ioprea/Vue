@@ -1,52 +1,54 @@
 <template lang="pug">
-  .add-cocktail.container
-    h2.center-align.indigo-text Add new cocktail recipe
-    form(@submit.prevent="addCocktail")
+  .edit-cocktail.container(v-if="cocktail")
+    h2 Edit cocktail
+    form(@submit.prevent="updateCocktail")
       .field.title
         label(for='title') Cocktail Title 🍹:
-        input(type='text' name='title' v-model="title")
+        input(type='text' name='title' v-model="cocktail.title")
       .flex
-        .ingredient-comp(v-for="(ing, i) in ingredients" :key="i")
+        .ingredient-comp(v-for="(ing, i) in cocktail.ingredients" :key="i")
           //- label(for="ingredient") Ingredient:
-          span.chip.ingredient(type='text' name='ingredient') {{ingredients[i]}}
+          span.chip.ingredient(type='text' name='ingredient') {{cocktail.ingredients[i]}}
             i.material-icons.delete-ing(@click="deleteIng(ing)") cancel
       .field.add-ingredients
         p.red-text(v-if="feedback") {{feedback}}
         label(for='add-ingredient') Cocktail Ingredients 🍌🍋🍉 (press tab to add):
         input(type='text' name='title' @keydown.tab.prevent="addIng" v-model="another")
       .field.center-align
-        button.btn.pink Add Cocktail
+        button.btn.pink Update Cocktail
 </template>
 <script>
+import db from '@/firebase/init'
 import slugify from 'slugify'
-import db from '../firebase/init'
+
 export default {
-  name: 'AddCocktail',
+  name: 'EditCocktail',
   data () {
     return {
-      title: null,
+      cocktail: null,
       another: null,
-      ingredients: [],
-      feedback: null,
-      slub: null
+      feedback: null
     }
   },
+  async created () {
+    let ref = await db.collection('cocktails').where('slug', '==' , this.$route.params.slug).get()
+    ref.forEach(cocktail => {
+      console.log(cocktail.data())
+      this.cocktail = cocktail.data()
+      this.cocktail.id = cocktail.id
+    })
+  },
   methods: {
-    async addCocktail () {
-      if (this.title) {
+    async updateCocktail () {
+      if (this.cocktail.title) {
         this.feedback = null
-        this.slug = slugify(this.title, {
+        this.cocktail.slug = slugify(this.cocktail.title, {
           replacement: '-',
           remove: /[$*_+()'"!\-:@]/g,
           lower: true
         })
-        console.log(this.slug);
         try {
-          await db.collection('cocktails').add({
-            title: this.title,
-            ingredients: this.ingredients,
-            slug: this.slug
-          })
+          await db.collection('cocktails').doc(this.cocktail.id).update(this.cocktail)
         } catch(err) {
           console.log(err)
         }
@@ -57,7 +59,7 @@ export default {
     },
     addIng () {
       if (this.another && this.another.trim()) {
-        this.ingredients.push(this.another.trim())
+        this.cocktail.ingredients.push(this.another.trim())
         console.log(this.ingredients)
         this.another = null
         this.feedback = null
@@ -66,13 +68,14 @@ export default {
       }
     },
     deleteIng (ingredient) {
-      this.ingredients = this.ingredients.filter(ing => ing !== ingredient)
+      this.cocktail.ingredients = this.cocktail.ingredients.filter(ing => ing !== ingredient)
     }
-  }
+  },
 }
+
 </script>
 <style lang="scss">
-  .add-cocktail {
+  .edit-cocktail {
     margin-top: 20px;
     padding: 20px;
     max-width: 80%;
