@@ -37,16 +37,19 @@ export default {
       map.addListener('click', (e) => {
         console.log('clicked', this.marker);
         if(this.marker) {
-          await db.collection('events').add({name: 'Custom event', geolocation: {lat: e.latLng.lat(), lng: e.latLng.lng()}})
+          let router = this.$router
+          db.collection('events').add({name: 'Custom event', geolocation: {lat: e.latLng.lat(), lng: e.latLng.lng()}})
+          .then(function(doc) {
+            marker.addListener('click', () => {
+              router.push({ name: 'ViewProfile', params: {id: doc.id} })
+            })
+          })
           let marker = new google.maps.Marker({
             position: {
               lat: e.latLng.lat(),
               lng: e.latLng.lng()
             },
             map
-          })
-          marker.addListener('click', () => {
-            this.$router.push({ name: 'ViewProfile', params: {id: doc.id} })
           })
         }
         this.marker = false
