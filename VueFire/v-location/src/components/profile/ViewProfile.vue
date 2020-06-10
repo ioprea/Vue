@@ -1,7 +1,7 @@
 <template lang="pug">
   .view-profile.container
-    .card(v-if="profile")
-      h2.deep-purple-text.center {{profile.alias}}'s Wall
+    .card(v-if="event")
+      h2.deep-purple-text.center {{event.name}}
       ul.comments.collection
         li(v-for="(comment, index) in comments" :key="index")
          .green-text.text-darken-1 {{comment.from}}
@@ -26,21 +26,26 @@ export default {
       feedback: null,
       newComment: null,
       user: null,
-      comments: []
+      comments: [],
+      event: null
     }
   },
   async created() {
-    let ref = db.collection('users')
+    let ref = db.collection('events')
+    let userRef = db.collection('users')
+    console.log('ref', this.$route);
+    let eventId = this.$route.params.id
     //get current user
-    let snapshot = await ref.where('user_id', '==', firebase.auth().currentUser.uid).get()
+    let snapshot = await userRef.where('user_id', '==', firebase.auth().currentUser.uid).get()
     snapshot.forEach(doc => {
       this.user = doc.data()
       this.user.id = doc.id
     })
 
-    // profile data
-    let user = await ref.doc(this.$route.params.id).get()
-    this.profile = user.data()
+    let event = await db.collection('events').doc(eventId).get()
+    this.event = event.data()
+    this.event.id = event.id
+    console.log('event', this.event);
 
     // comments
     db.collection('comments').where('to', '==', this.$route.params.id).onSnapshot(snapshot => {
@@ -62,6 +67,7 @@ export default {
   },
   methods: {
     addComment() {
+      console.log('thi suer', this.user);
       if (this.newComment) {
         this.feedback = null
         db.collection('comments').add({
