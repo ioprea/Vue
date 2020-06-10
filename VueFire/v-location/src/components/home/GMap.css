@@ -1,0 +1,9 @@
+.add-button {
+    position: absolute!important;
+    bottom: 10px;
+    left: 10px;
+}
+
+.module {
+    cursor: url('../../../public/place.svg'), auto;	
+}
