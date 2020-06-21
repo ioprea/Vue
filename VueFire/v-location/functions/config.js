@@ -1,0 +1,1 @@
+module.exports = { email:"vlocation.app@gmail.com", password: "Vlocation1237" }

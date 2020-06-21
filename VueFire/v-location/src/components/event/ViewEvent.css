@@ -1,0 +1,11 @@
+.flex {
+    display: flex;
+}
+
+.icons {
+    float: right;
+}
+
+.icons i { 
+    cursor: pointer;
+}
