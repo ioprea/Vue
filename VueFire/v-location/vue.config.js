@@ -7,19 +7,22 @@ module.exports = {
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
 
-    // configure the workbox plugin
-    workboxPluginMode: 'InjectManifest',
-    workboxOptions: {
-      // swSrc is required in InjectManifest mode.
-      swSrc: 'src/registerServiceWorker.js'
-      // ...other Workbox options...
-    },
-    icons: [
-        {
-            'src': 'public/location.png',
-            'sizes': '512x512',
-            'type': 'image/png',
-        },
-    ],
+    // // configure the workbox plugin
+    // workboxPluginMode: 'InjectManifest',
+    // workboxOptions: {
+    //   // swSrc is required in InjectManifest mode.
+    //   swSrc: 'public/firebase-messaging-sw.js'
+    //   // ...other Workbox options...
+    // },
+    // manifestOptions: {
+    //     icons: [
+    //         {
+    //             'src': './location.png',
+    //             'sizes': '512x512',
+    //             'type': 'image/png',
+    //         },
+    //     ],
+    //     gcm_sender_id: "664944818043"
+    // }
   }
 }

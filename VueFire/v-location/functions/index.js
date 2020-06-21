@@ -7,6 +7,8 @@ const app = express()
 const encKey = '0123456789123456'
 const nodemailer = require('nodemailer')
 const mailConf = require('./config')
+const axios = require('axios')
+
 app.use(bodyParser.urlencoded())
 
 app.use(bodyParser.json())
@@ -138,12 +140,33 @@ exports.deleteUser = functions.auth.user().onDelete(user => {
 exports.notifyNewEvent = functions.firestore
   .document('events/{id}')
   .onCreate(async (snap, context) => {
-    console.log('snap ->', snap)
-    console.log('context ->', context)
     const snapshot = await db.collection('users').get()
     snapshot.docs.forEach(doc => {
         let data = doc.data()
         sendNotificationEmail(data.email, `https://v-location.web.app/event/${context.params.id}`)
+    })
+    const data = await db.collection('tokens').doc('token').get()
+    let tokens = Object.keys(data.data())
+    console.log('snapshot', tokens)
+    tokens.forEach(token => {
+        console.log('token', token);
+        axios({
+            method: 'post',
+            url: 'https://fcm.googleapis.com/fcm/send',
+            headers: {
+                Authorization: 'key=AAAAmtHMt3s:APA91bFWS3lB5MNNKqvsYxY36A_HLYpE6EUVV8YRUOhTzlUDFNWkuGGCfvOVLs5UHsNrAYu5kIQtZ9Lm_vrK2YsxfcyI7gLmPrZ8PeZiURKCoPD3UDQQaotLaQ-Upsui4kINMzx0VcDA',
+                ContentType: 'application/json'
+            }, 
+            data: {
+                "to": token,
+                "notification": {
+                    "title": "Events Reporter",
+                    "body": "A new event has been added",
+                    "icon": "./img/icons/android-chrome-192x192.png"
+                }
+            }
+        }).then(resp => console.log('Success ', resp.status, resp.statusText))
+        .catch(err => console.log('Success ', err.status, err.statusText))
     })
     // let dataBefore = snap.before.data().applicants || []
     // let dataAfter = snap.after.data().applicants || []
