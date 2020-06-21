@@ -16,7 +16,8 @@ export default {
   data() {
     return {
       currentUser: null,
-      marker: false
+      marker: false,
+      infoWindow: null
     }
   },
   methods: {
@@ -33,15 +34,29 @@ export default {
         minZoom: 3,
         streetViewControl: false
       })
+
+      let infoWindow = new google.maps.InfoWindow
+      infoWindow.setPosition({ lat: this.lat, lng: this.lng });
+      infoWindow.setContent('Location found.');
+      infoWindow.open(map);
+      map.setCenter({ lat: this.lat, lng: this.lng });
+
       let pressTimer
       map.addListener('click', (e) => {
         console.log('clicked', this.marker);
         if(this.marker) {
           let router = this.$router
-          db.collection('events').add({name: 'Custom event', geolocation: {lat: e.latLng.lat(), lng: e.latLng.lng()}})
+          db.collection('events').add({
+            name: 'Custom event',
+            geolocation: {lat: e.latLng.lat(), lng: e.latLng.lng()},
+            owner: this.currentUser.user_id,
+            likes: [this.currentUser.user_id],
+            eventType: '',
+            dislikes: []
+          })
           .then(function(doc) {
             marker.addListener('click', () => {
-              router.push({ name: 'ViewProfile', params: {id: doc.id} })
+              router.push({ name: 'ViewEvent', params: {id: doc.id} })
             })
           })
           let marker = new google.maps.Marker({
@@ -56,7 +71,6 @@ export default {
       })
 
       db.collection('events').get().then(event => {
-        console.log('events =>', event)
         event.docs.forEach(doc => {
           let data = doc.data()
           if (data.geolocation) {
@@ -68,7 +82,7 @@ export default {
               map
             })
             marker.addListener('click', () => {
-              this.$router.push({ name: 'ViewProfile', params: {id: doc.id} })
+              this.$router.push({ name: 'ViewEvent', params: {id: doc.id} })
             })
           }
         })
@@ -91,6 +105,7 @@ export default {
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async pos => {
+        console.log('current position !!', pos);
         this.lat = pos.coords.latitude || 44.427968
         this.lng = pos.coords.longitude || 26.103211
 

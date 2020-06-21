@@ -10,11 +10,13 @@
            router-link(:to="{name: 'Login'}") Login
           li(v-if="user")
            a(@click="logout") Logout
-          li(v-if="user") Logged in as: {{user.email}}
+          li(v-if="user" class="logInfo") Logged in as: {{user.email}}
 </template>
 <script>
 import firebase from 'firebase/app'
 import 'firebase/auth'
+import './Navbar.css'
+
 export default {
   name: 'Narbar',
   data() {

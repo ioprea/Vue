@@ -39,7 +39,7 @@ export default {
           remove: /[$*_+()'"!\-:@]/g,
           lower: true
         })
-        let ref = db.collection('users').doc(this.slug)
+        let ref = db.collection('users').doc()
         let resp = await ref.get()
         if (resp.exists) {
           this.feedback = 'Already exists!'
@@ -49,7 +49,8 @@ export default {
             await ref.set({
               alias: this.alias,
               geolocation: null,
-              user_id: cred.user.uid
+              user_id: cred.user.uid,
+              email: this.email
             })
             this.$router.push({name: 'GMap'})
           } catch (error) {

@@ -26,9 +26,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../components/auth/Login.vue')
   },
   {
-    path: '/profile/:id',
-    name: 'ViewProfile',
-    component: () => import(/* webpackChunkName: "about" */ '../components/profile/ViewProfile.vue'),
+    path: '/event/:id',
+    name: 'ViewEvent',
+    component: () => import(/* webpackChunkName: "about" */ '../components/event/ViewEvent.vue'),
     meta: {
       requiresAuth: true
     }
